@@ -20,19 +20,18 @@ class RequestHandler(threading.Thread):
         self.jMessage = dict()
 
     def run(self):
-        requestType = self.message.splitlines()[0].split(' ')[0]
         try:
-            self.jMessage = json.loads(self.message)
+            self.jMessage = json.loads(self.message)    # 尝试将接收到的消息转换为dict
         except Exception as e:
             print("Cannot convert message to a json dict.")
             return
-        if self.jMessage['requestType'] != REQUEST_TYPES[0]:
+        if self.jMessage['requestType'] != REQUEST_TYPES[0]:    # 检查请求类型
             print("Error: requestType not matched\nReceived:"+jMessage['requestType']+
             '\nExpected:'+REQUEST_TYPES[0])
-        elif self.jMessage['serviceName'] != self.serviceName:
+        elif self.jMessage['serviceName'] != self.serviceName:  # 检查服务名称
             print("Error: serviceName not matched\nReceived:"+jMessage['serviceName']+
             '\nExpected:'+self.serviceName)
-        else:
+        else:   # 若请求类型与请求名称都正确，进入处理请求环节
             self.handleRequest()
             self.getConfirm(TIMEOUT)
     
@@ -49,13 +48,13 @@ class PositionReceiver(RequestHandler):
         self.serviceName = 'PositionUpload'
 
     def handleRequest(self):
-        # 传出confirm_recv，关闭curClient
+        # 传出data_on_request，关闭curClient
         response = dict()
         response['requestType'] = REQUEST_TYPES[1]
         response['serviceName'] = self.serviceName
         jsonStr = json.dumps(response)
         self.curClient.send(jsonStr.encode())
-        # self.jMessage就是存储位置信息的字典，可以在这里进行操作
+        # self.jMessage就是存储位置信息的dict，可以在这里进行操作
 
     def getConfirm(self, timeout):
         '''
@@ -93,7 +92,7 @@ class CallInfoReceiver(RequestHandler):
         response['serviceName'] = self.serviceName
         jsonStr = json.dumps(response)
         self.curClient.send(jsonStr.encode())
-        # self.jMessage就是存储电话信息的字典，可以在这里进行操作
+        # self.jMessage就是存储通话记录信息的dict，可以在这里进行操作
 
     def getConfirm(self, timeout):
         '''
